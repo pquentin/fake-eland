@@ -2,7 +2,6 @@
 FROM docker.elastic.co/wolfi/python:3.10-dev AS builder
 
 WORKDIR /eland
-
 ENV VIRTUAL_ENV=/eland/venv
 RUN python -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
@@ -13,7 +12,8 @@ ADD eland_import_hub_model $VIRTUAL_ENV/bin
 ## distroless image at runtime
 FROM docker.elastic.co/wolfi/python:3.10
 
+WORKDIR /eland
 ENV VIRTUAL_ENV=/eland/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-COPY --from=builder $VIRTUAL_ENV/bin/eland_import_hub_model $VIRTUAL_ENV/bin
+COPY --from=builder /eland/venv /eland/venv

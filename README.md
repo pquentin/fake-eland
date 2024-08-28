@@ -39,4 +39,15 @@ Total: 0 (UNKNOWN: 0, LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0)
 $ docker run -it fake-eland-wolfi eland_import_hub_model --foo bar baz
 /usr/bin/python: can't open file '//eland_import_hub_model': [Errno 2] No such file or directory
 ```
-This suggests the entrypoint of the Wolfi image is Python, which does not read PATH and cannot find the `eland_import_hub_model` file.
+
+This suggests the entrypoint of the Wolfi image is Python, which does not read PATH and cannot find the `eland_import_hub_model` file. This suggests that we can give it the absolute path to the file, and it indeed works:
+
+```bash
+$ docker run -it fake-eland-wolfi /eland/venv/bin/eland_import_hub_mode --foo bar baz
+success! ['/eland/venv/bin/eland_import_hub_model', '--foo', 'bar', 'baz']
+```
+
+But we don't want to type "/eland/venv/bin" as it's not backwards-compatible (and ugly). I believe we have two options:
+
+ * Add a shell that supports PATH and shebang (such as ash)
+ * Add a wrapper Python script as ENTRYPOINT that invokes `eland_import_hub_model`.
