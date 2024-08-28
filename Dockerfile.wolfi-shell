@@ -1,0 +1,24 @@
+# syntax=docker/dockerfile:1
+FROM docker.elastic.co/wolfi/python:3.10-dev AS builder
+
+WORKDIR /eland
+ENV VIRTUAL_ENV=/eland/venv
+RUN python -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+# Install
+ADD eland_import_hub_model $VIRTUAL_ENV/bin
+
+## distroless image at runtime
+FROM docker.elastic.co/wolfi/python:3.10
+
+WORKDIR /eland
+ENV VIRTUAL_ENV=/eland/venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+COPY --from=builder /eland/venv /eland/venv
+# https://stackoverflow.com/questions/61039877/add-shell-or-bash-to-a-docker-image-distroless-based-on-debian-gnu-linux
+COPY --from=builder /bin/sh /bin/sh
+
+# https://stackoverflow.com/questions/37634483/default-docker-entrypoint
+ENTRYPOINT []

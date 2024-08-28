@@ -47,7 +47,17 @@ $ docker run -it fake-eland-wolfi /eland/venv/bin/eland_import_hub_mode --foo ba
 success! ['/eland/venv/bin/eland_import_hub_model', '--foo', 'bar', 'baz']
 ```
 
-But we don't want to type "/eland/venv/bin" as it's not backwards-compatible (and ugly). I believe we have two options:
+But we don't want to type "/eland/venv/bin" as it's not backwards-compatible (and ugly). To keep the previous behavior, we need a shell.
 
- * Add a shell that supports PATH and shebang (such as ash)
- * Add a wrapper Python script as ENTRYPOINT that invokes `eland_import_hub_model`.
+## ✅? Using a Wolfi base image + shell
+
+I initially implemented what a shell would have done in 10 lines of Python, but error handling would have been bad. Instead, I can use /bin/sh from python:3.10-dev (which is actually ash in busybox, and takes 658KB).
+
+```bash
+$ docker build -f Dockerfile.wolfi-shell -t fake-eland-wolfi .
+$ trivy image fake-eland-wolfi
+[...]
+Total: 0 (UNKNOWN: 0, LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0)
+$ docker run -it fake-eland-wolfi eland_import_hub_model --foo bar baz
+success! ['/eland/venv/bin/eland_import_hub_model', '--foo', 'bar', 'baz']
+```
