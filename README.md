@@ -22,6 +22,9 @@ Here's how I'm testing the two Dockerfiles.
 
 ```bash
 $ docker build -t fake-eland-wolfi .
+$ trivy image fake-eland
+[...]
+Total: 104 (UNKNOWN: 0, LOW: 67, MEDIUM: 29, HIGH: 7, CRITICAL: 1)
 $ docker run -it fake-eland-wolfi eland_import_hub_model --foo bar baz
 success! ['/eland/venv/bin/eland_import_hub_model', '--foo', 'bar', 'baz']
 ```
@@ -30,6 +33,9 @@ success! ['/eland/venv/bin/eland_import_hub_model', '--foo', 'bar', 'baz']
 
 ```bash
 $ docker build -f Dockerfile.wolfi -t fake-eland-wolfi .
+$ trivy image fake-eland-wolfi
+[...]
+Total: 0 (UNKNOWN: 0, LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0)
 $ docker run -it fake-eland-wolfi eland_import_hub_model --foo bar baz
 /usr/bin/python: can't open file '//eland_import_hub_model': [Errno 2] No such file or directory
 ```
