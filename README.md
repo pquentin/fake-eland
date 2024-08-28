@@ -1,19 +1,22 @@
 # Migrating Eland Docker image to Wolfi
 
 This repository produces a minimal example to show the problem I'm having with
-migrating Eland Docker image to Wolfi. This Docker image exists solely to run
-the "eland_import_hub_model" Python script, which is annoying to install
+migrating Eland's Docker image to Wolfi. This Docker image exists solely to run
+the `eland_import_hub_model` Python script, which is annoying to install
 locally as it requires a working Python environment and GBs of dependencies.
-(As soon as we started publishing this image, our number of support cases
-about installing Eland dropped to zero.)
+(As soon as we started publishing this Docker image, our number of support
+cases about installing Eland dropped to zero.)
 
-In this repository, "eland_import_hub_model" reproduces the way Python installs
-console scripts: in the virtual environment "bin" directory, with a shebang
-that points to the Python installed in that environment. This means we need
-cooperation from a shell to read that shebang line and invoke the correct
-Python interpreter.
+In this repository, `eland_import_hub_model` reproduces the way Python installs
+console scripts:
 
-Here's how to reproduce what I'm seeing:
+ * in the `bin` directory of the active virtual environment "bin" directory
+ * and with a shebang line telling the shell where the Python interpreter is in that virtual envirnment.
+
+This means we need a shell to read that shebang line and run the script with
+the correct Python interpreter.
+
+Here's how I'm testing the two Dockerfiles.
 
 ## ✅ Using a Debian base image
 
@@ -30,6 +33,4 @@ $ docker build -f Dockerfile.wolfi -t fake-eland-wolfi .
 $ docker run -it fake-eland-wolfi eland_import_hub_model --foo bar baz
 /usr/bin/python: can't open file '//eland_import_hub_model': [Errno 2] No such file or directory
 ```
-
-This suggests the entrypoint of the Wolfi image is Python, which ironically
-does not know how to run that image.
+This suggests the entrypoint of the Wolfi image is Python, which does not read PATH and cannot find the `eland_import_hub_model` file.
